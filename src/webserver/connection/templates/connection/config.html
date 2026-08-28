@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create / Edit Room</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+
+    <style>
+        :root {
+            --bg-1: #eef6ff;
+            --bg-2: #f8fbff;
+            --surface: #ffffff;
+            --text: #18324b;
+            --muted: #6d8094;
+            --border: #d8e3ee;
+            --shadow: 0 14px 40px rgba(18, 45, 72, 0.10);
+            --primary: #0d6efd;
+            --primary-soft: rgba(13, 110, 253, 0.10);
+            --success: #198754;
+            --success-soft: rgba(25, 135, 84, 0.10);
+            --danger: #dc3545;
+            --danger-soft: rgba(220, 53, 69, 0.08);
+            --radius-xl: 1.25rem;
+            --radius-lg: 1rem;
+            --radius-md: 0.75rem;
+        }
+
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            background:
+                radial-gradient(circle at top left, rgba(13,110,253,0.08), transparent 35%),
+                linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+            color: var(--text);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .page-shell {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 2rem 1rem 3rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title {
+            margin: 0 0 0.5rem;
+            font-size: clamp(1.8rem, 3vw, 2.7rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .card-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            margin: 0 0 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 750;
+        }
+
+        .note-box {
+            background: #f8fbff;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1rem 1rem 1.1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .note-title {
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            color: var(--primary);
+        }
+
+        .note-box p {
+            margin: 0.25rem 0;
+        }
+
+        .code-inline {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.4rem;
+            font-size: 0.95em;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.45rem;
+        }
+
+        .form-field input,
+        .form-field textarea,
+        .form-field select {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 0.9rem;
+            font-size: 1rem;
+            background: #fff;
+            color: var(--text);
+            box-sizing: border-box;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .form-field input:focus,
+        .form-field textarea:focus,
+        .form-field select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-soft);
+        }
+
+        .form-field textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .help-text {
+            margin-top: 0.35rem;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .errorlist {
+            margin: 0.45rem 0 0;
+            padding-left: 1.25rem;
+            color: var(--danger);
+            font-size: 0.92rem;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.4rem;
+        }
+
+        .result-box {
+            margin-top: 1.25rem;
+            background: #f8fff9;
+            border: 1px solid #d3ead9;
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            color: var(--success);
+        }
+
+        .warn-box {
+            margin-top: 1rem;
+            background: #fffdf5;
+            border: 1px solid #f0e0b0;
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            color: #8a6100;
+        }
+
+        .warn-box ul {
+            margin: 0.5rem 0 0;
+            padding-left: 1.2rem;
+        }
+
+        .model-multi {
+            max-height: 190px;
+            overflow-y: auto;
+            border: 1px solid #dbe4ee;
+            border-radius: var(--radius-md);
+            padding: 0.6rem 0.75rem;
+        }
+
+        .model-multi ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .model-multi li {
+            padding: 0.15rem 0;
+        }
+
+        .room-list {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .room-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.9rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            background: #fcfdff;
+        }
+
+        .room-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .room-name {
+            font-weight: 700;
+        }
+
+        .room-details {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .empty-state {
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .footer-link a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 700px) {
+            .room-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-shell">
+    <header class="hero">
+        <h1 class="hero-title">Manage Rooms</h1>
+        <p class="hero-subtitle">
+            Create new demo rooms, assign models, and manage existing rooms in one place.
+        </p>
+    </header>
+
+    <section class="card-box">
+        <h2 class="section-title">Create a Room</h2>
+
+        <div class="note-box">
+            <div class="note-title">Model naming convention</div>
+            <p>
+                The config file, ONNX model, and selected model name should refer to the same model.
+            </p>
+            <p>
+                Example:
+                <span class="code-inline">convtest.json</span>,
+                <span class="code-inline">convtest.onnx</span>,
+                <span class="code-inline">model_name = convtest</span>
+            </p>
+        </div>
+        {% if user.is_staff %}
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="{{ form.room_name.id_for_label }}">Room name</label>
+                    {{ form.room_name }}
+                    <div class="help-text">Used as the room identifier for signaling and URLs.</div>
+                    {{ form.room_name.errors }}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ form.model_name.id_for_label }}">Default model</label>
+                    {{ form.model_name }}
+                    <div class="help-text">{{ form.model_name.help_text }}</div>
+                    {{ form.model_name.errors }}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ form.model_names.id_for_label }}">Also available in this room</label>
+                    <div class="model-multi">{{ form.model_names }}</div>
+                    <div class="help-text">{{ form.model_names.help_text }}</div>
+                    {{ form.model_names.errors }}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ form.title.id_for_label }}">Page title</label>
+                    {{ form.title }}
+                    <div class="help-text">Optional title shown at the top of the demo page.</div>
+                    {{ form.title.errors }}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ form.description.id_for_label }}">Short description</label>
+                    {{ form.description }}
+                    <div class="help-text">Optional short text shown below the title on the demo page.</div>
+                    {{ form.description.errors }}
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button type="submit" class="btn btn-primary">Save Room</button>
+                <a href="{% url 'connection:home' %}" class="btn btn-outline-secondary">Back to Home</a>
+            </div>
+        </form>
+        {% else %}
+        You are not allowed to do this.<br>
+        {% endif %}
+
+        {% if saved_room %}
+        <div class="result-box">
+            <strong>Room saved successfully</strong><br>
+            Room: {{ saved_room.room_name }}<br>
+            Model: {{ saved_room.model_name }}<br>
+            {% if saved_room.available_models|length > 1 %}
+                Switchable models: {{ saved_room.available_models|join:", " }}<br>
+            {% endif %}
+            {% if saved_room.title %}
+                Title: {{ saved_room.title }}<br>
+            {% endif %}
+            {% if saved_room.description %}
+                Description: {{ saved_room.description }}
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if config_warnings %}
+        <div class="warn-box">
+            <strong>These models differ — the room still works, but the
+            comparison may not be like for like:</strong>
+            <ul>
+                {% for w in config_warnings %}<li>{{ w }}</li>{% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </section>
+
+    {% if user.is_staff %}
+    <section class="card-box">
+        <h2 class="section-title">Existing Rooms</h2>
+
+        {% if room_list %}
+        <div class="room-list">
+            {% for room in room_list %}
+            <div class="room-row">
+                <div class="room-meta">
+                    <div class="room-name">{{ room.room_name }}</div>
+                    <div class="room-details">
+                        Model: {{ room.model_name }}
+                        {% if room.title %} · Title: {{ room.title }}{% endif %}
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn btn-outline-danger btn-sm"
+                    onclick="location.href='{% url 'connection:room_delete' room_id=room.id %}'">
+                    Delete
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No rooms have been created yet.</p>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    <div class="footer-link">
+        <a href="{% url 'connection:home' %}">Back to Home</a>
+    </div>
+</div>
+
+<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

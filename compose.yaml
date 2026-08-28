@@ -1,0 +1,47 @@
+services:
+  django:
+    build:
+      context: .
+      tags:
+        - speech-enhancement-demo-django
+    environment:
+      # https (default) or http. Plain HTTP avoids the certificate warning but
+      # browsers then block the microphone on anything except http://localhost,
+      # so it is for single-machine or USB-forwarded use only.
+      - SERVE_PROTOCOL=${SERVE_PROTOCOL:-https}
+      - SSL_CERT_PATH=/etc/ssl/private/ssl_cert.pem
+      - SSL_KEY_PATH=/etc/ssl/private/ssl_key.pem
+      - SSL_INT_PATH=/etc/ssl/private/ssl_intermediate.pem
+      # Unset means "local access only". Set to the name the demo is reached
+      # under, and add the matching origin for admin and management POSTs.
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-}
+      - DJANGO_CSRF_TRUSTED_ORIGINS=${DJANGO_CSRF_TRUSTED_ORIGINS:-}
+      # Generated per restart when unset, which logs everyone out on restart.
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-}
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-}
+      # Optional: creates the staff account the management pages require, in
+      # the same database the server uses. Ignored if the user already exists.
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME:-}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL:-admin@example.org}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD:-}
+    volumes:
+      - "./src:/home/app/src"
+      # Point these at your own certificate. When a path does not exist Docker
+      # creates a directory there and the entrypoint falls back to the
+      # self-signed development pair, with a warning in the log.
+      - "${SSL_CERT_FILE:-./src/webserver/cert/cert.pem}:/etc/ssl/private/ssl_cert.pem:ro"
+      - "${SSL_KEY_FILE:-./src/webserver/cert/privkey.pem}:/etc/ssl/private/ssl_key.pem:ro"
+      - "${SSL_INT_FILE:-./src/webserver/cert/cert.pem}:/etc/ssl/private/ssl_intermediate.pem:ro"
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    restart: always
+  
+  sphinx:
+    build: "sphinx/"
+    command: "sphinx-autobuild -b html --host 0.0.0.0 --port 80 source build"
+    volumes:
+      - "./docs:/docs"
+    ports:
+      - "80:80"
+    restart: always

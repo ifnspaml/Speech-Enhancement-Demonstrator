@@ -1,0 +1,12 @@
+# Pinned to the versions the demonstrator is known to run on.
+
+Django==5.2.16
+daphne==4.2.3
+channels==4.3.2
+channels_redis==4.3.0
+redis==8.0.1
+django_extensions==4.1
+pyOpenSSL==26.3.0
+werkzeug==3.1.8
+whitenoise==6.12.0
+django_sslserver==0.22

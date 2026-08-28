@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Rooms</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+
+    <style>
+        :root {
+            --bg-1: #eef6ff;
+            --bg-2: #f8fbff;
+            --surface: #ffffff;
+            --text: #18324b;
+            --muted: #6d8094;
+            --border: #d8e3ee;
+            --shadow: 0 14px 40px rgba(18, 45, 72, 0.10);
+            --primary: #0d6efd;
+            --primary-soft: rgba(13, 110, 253, 0.10);
+            --radius-xl: 1.25rem;
+            --radius-lg: 1rem;
+        }
+
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            background:
+                radial-gradient(circle at top left, rgba(13,110,253,0.08), transparent 35%),
+                linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+            color: var(--text);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .page-shell {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 2.5rem 1rem 3rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .hero-title {
+            margin: 0 0 0.5rem;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .card-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            margin: 0 0 1rem;
+            font-size: 1.2rem;
+            font-weight: 750;
+        }
+
+        .room-list {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .room-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            background: #fcfdff;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+
+        .room-row:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 24px rgba(13, 110, 253, 0.08);
+        }
+
+        .room-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .room-name {
+            font-size: 1.05rem;
+            font-weight: 750;
+        }
+
+        .room-description {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .room-details {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .empty-state {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .footer-link a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 700px) {
+            .room-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .room-row .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-shell">
+    <header class="hero">
+        <h1 class="hero-title">Available Demo Rooms</h1>
+        <p class="hero-subtitle">
+            Select a room to start or join a live audio enhancement demonstration.
+        </p>
+    </header>
+
+    <section class="card-box">
+        <h2 class="section-title">Rooms</h2>
+
+        {% if room_list %}
+        <div class="room-list">
+            {% for room in room_list %}
+            <div class="room-row">
+                <div class="room-meta">
+                    <div class="room-name">
+                        {% if room.title %}
+                            {{ room.title }}
+                        {% else %}
+                            {{ room.room_name }}
+                        {% endif %}
+                    </div>
+
+                    {% if room.description %}
+                    <div class="room-description">
+                        {{ room.description }}
+                    </div>
+                    {% endif %}
+
+                    <div class="room-details">
+                        Room ID: {{ room.room_name }} · Model: {{ room.model_name }}
+                    </div>
+                </div>
+
+                <a href="{% url 'connection:room_detail' room.id %}" class="btn btn-primary">
+                    Open Room
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No rooms are currently available.</p>
+        {% endif %}
+    </section>
+
+    <div class="footer-link">
+        <a href="{% url 'connection:home' %}">Back to Home</a>
+    </div>
+</div>
+
+<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+
+    <style>
+        :root {
+            --bg-1: #eef6ff;
+            --bg-2: #f8fbff;
+            --surface: #ffffff;
+            --text: #18324b;
+            --muted: #6d8094;
+            --border: #d8e3ee;
+            --shadow: 0 14px 40px rgba(18, 45, 72, 0.10);
+            --primary: #0d6efd;
+            --primary-soft: rgba(13, 110, 253, 0.10);
+            --radius-xl: 1.25rem;
+            --radius-lg: 1rem;
+        }
+
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            background:
+                radial-gradient(circle at top left, rgba(13,110,253,0.08), transparent 35%),
+                linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+            color: var(--text);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .page-shell {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title {
+            margin: 0 0 0.5rem;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1.05rem;
+        }
+
+        .nav-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .nav-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .nav-link-card {
+            display: block;
+            text-decoration: none;
+            color: var(--text);
+            background: #fcfdff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.1rem;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+
+        .nav-link-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 24px rgba(13, 110, 253, 0.08);
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .nav-link-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link-text {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-shell">
+    <header class="hero">
+        <h1 class="hero-title">Audio Demo Control Center</h1>
+        <p class="hero-subtitle">
+            Open demo rooms, manage room configuration, and upload or remove processing models.
+        </p>
+    </header>
+
+    <section class="nav-card">
+        <div class="nav-grid">
+            <a class="nav-link-card" href="{% url 'connection:room_list' %}">
+                <div class="nav-link-title">Open a Room</div>
+                <div class="nav-link-text">Browse the available rooms and enter a live demo session.</div>
+            </a>
+            
+            {% if user.is_staff %}
+            <a class="nav-link-card" href="{% url 'connection:room_manage' %}">
+                <div class="nav-link-title">Manage Rooms</div>
+                <div class="nav-link-text">Create rooms, assign models, edit titles/descriptions, and delete rooms.</div>
+            </a>
+
+            <a class="nav-link-card" href="{% url 'connection:model_manage' %}">
+                <div class="nav-link-title">Manage Models</div>
+                <div class="nav-link-text">Upload new ONNX/config pairs and remove installed models.</div>
+            </a>
+            {% endif %}
+
+        </div>
+    </section>
+</div>
+
+<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

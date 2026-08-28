@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Models</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+
+    <style>
+        :root {
+            --bg-1: #eef6ff;
+            --bg-2: #f8fbff;
+            --surface: #ffffff;
+            --text: #18324b;
+            --muted: #6d8094;
+            --border: #d8e3ee;
+            --shadow: 0 14px 40px rgba(18, 45, 72, 0.10);
+            --primary: #0d6efd;
+            --primary-soft: rgba(13, 110, 253, 0.10);
+            --success: #198754;
+            --danger: #dc3545;
+            --radius-xl: 1.25rem;
+            --radius-lg: 1rem;
+            --radius-md: 0.75rem;
+        }
+
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            background:
+                radial-gradient(circle at top left, rgba(13,110,253,0.08), transparent 35%),
+                linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+            color: var(--text);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .page-shell {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 2rem 1rem 3rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title {
+            margin: 0 0 0.5rem;
+            font-size: clamp(1.8rem, 3vw, 2.7rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .card-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            margin: 0 0 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 750;
+        }
+
+        .note-box {
+            background: #f8fbff;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1rem 1rem 1.1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .note-box p {
+            margin: 0.25rem 0;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.45rem;
+        }
+
+        .form-field input {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 0.9rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .success-box {
+            margin-top: 1rem;
+            background: #f8fff9;
+            border: 1px solid #d3ead9;
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            color: var(--success);
+        }
+
+        .model-list {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .model-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.9rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            background: #fcfdff;
+        }
+
+        .model-name {
+            font-weight: 700;
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .footer-link a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 700px) {
+            .model-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-shell">
+    <header class="hero">
+        <h1 class="hero-title">Manage Models</h1>
+        <p class="hero-subtitle">
+            Upload new model/config pairs and remove installed models when needed.
+        </p>
+    </header>
+
+    <section class="card-box">
+        <h2 class="section-title">Add a New Model</h2>
+
+        <div class="note-box">
+            <p>
+                Choose a logical model name and upload the corresponding ONNX and JSON config files.
+            </p>
+            <p>
+                The uploaded filenames do not need to match. They will be stored as
+                <strong>&lt;model_name&gt;.onnx</strong> and <strong>&lt;model_name&gt;.json</strong>.
+            </p>
+        </div>
+
+        {% if user.is_staff %}
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="{{ form.model_name.id_for_label }}">Model name</label>
+                    {{ form.model_name }}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ form.file.id_for_label }}">ONNX model file</label>
+                    {{ form.file }}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ form.config_file.id_for_label }}">Config JSON file</label>
+                    {{ form.config_file }}
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button type="submit" class="btn btn-primary">Upload Model</button>
+                <a href="{% url 'connection:home' %}" class="btn btn-outline-secondary">Back to Home</a>
+            </div>
+        </form>
+        {% else %}
+        You are not allowed to do this.<br>
+        {% endif %}
+
+        {% if upload_success %}
+        <div class="success-box">
+            Model <strong>{{ uploaded_model_name }}</strong> was uploaded successfully.
+        </div>
+        {% endif %}
+    </section>
+
+    {% if user.is_staff %}
+    <section class="card-box">
+        <h2 class="section-title">Installed Models</h2>
+
+        {% if installed_models %}
+        <div class="model-list">
+            {% for model in installed_models %}
+            <div class="model-row">
+                <div class="model-name">{{ model }}</div>
+                <button
+                    type="button"
+                    class="btn btn-outline-danger btn-sm"
+                    onclick="location.href='{% url 'connection:model_delete' model_name=model %}'">
+                    Delete
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No installed models found.</p>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    <div class="footer-link">
+        <a href="{% url 'connection:home' %}">Back to Home</a>
+    </div>
+</div>
+
+<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

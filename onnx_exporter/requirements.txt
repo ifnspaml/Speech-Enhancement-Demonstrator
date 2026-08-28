@@ -1,0 +1,9 @@
+# For the export scripts only; the demonstrator itself needs none of this.
+#
+# The graph rewriting in exporter.py targets the TorchScript exporter
+# (torch.onnx.export(..., dynamo=False)). Newer PyTorch defaults to the dynamo
+# exporter, whose graphs it cannot rewire -- see example_export.py.
+torch
+onnx
+onnxruntime
+pyyaml

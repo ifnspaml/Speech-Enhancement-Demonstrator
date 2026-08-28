@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talking Room {{ room }}</title>
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+
+    <style>
+        :root {
+            --bg-1: #eef6ff;
+            --bg-2: #f8fbff;
+            --surface: rgba(255, 255, 255, 0.82);
+            --surface-strong: #ffffff;
+            --text: #18324b;
+            --muted: #6d8094;
+            --border: #d8e3ee;
+            --shadow: 0 14px 40px rgba(18, 45, 72, 0.10);
+
+            --primary: #0d6efd;
+            --primary-soft: rgba(13, 110, 253, 0.12);
+
+            --success: #198754;
+            --success-soft: rgba(25, 135, 84, 0.12);
+
+            --warning: #f0ad00;
+            --danger: #dc3545;
+
+            --spectro-bg: #09121e;
+            --raw-glow: rgba(13, 110, 253, 0.12);
+            --enhanced-glow: rgba(25, 135, 84, 0.12);
+
+            --radius-xl: 1.5rem;
+            --radius-lg: 1rem;
+            --radius-md: 0.75rem;
+        }
+
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            background:
+                radial-gradient(circle at top left, rgba(13,110,253,0.10), transparent 35%),
+                radial-gradient(circle at top right, rgba(25,135,84,0.08), transparent 30%),
+                linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+            color: var(--text);
+        }
+
+        body {
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .demo-page {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 1.25rem 1rem 2.5rem;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .brand-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3.35rem);
+            line-height: 1.05;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-subtitle {
+            margin: 0;
+            color: var(--muted);
+            max-width: 760px;
+            font-size: 1.02rem;
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.7rem 1rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .chip-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background: #adb5bd;
+            box-shadow: 0 0 0 4px rgba(173,181,189,0.15);
+        }
+
+        .chip-dot.on {
+            background: var(--success);
+            box-shadow: 0 0 0 4px rgba(25,135,84,0.15);
+        }
+
+        .chip-dot.off {
+            background: var(--danger);
+            box-shadow: 0 0 0 4px rgba(220,53,69,0.15);
+        }
+
+        .control-card {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toggle-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.7rem 0.95rem;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 0.95rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .toggle-pill input {
+            transform: scale(1.15);
+        }
+
+        .hint-text {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .chip-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+
+        .insecure-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid rgba(220, 53, 69, 0.5);
+            background: rgba(220, 53, 69, 0.12);
+            color: #a32330;
+            font-size: 0.88rem;
+            font-weight: 600;
+            max-width: 26rem;
+        }
+
+        .browser-dsp-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid rgba(240, 173, 0, 0.5);
+            background: rgba(240, 173, 0, 0.12);
+            color: #8a6100;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .capture-panel {
+            display: grid;
+            gap: 0.7rem;
+        }
+
+        .capture-toggles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem;
+        }
+
+        .capture-toggles label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.92rem;
+        }
+
+        .capture-toggles input:disabled + span {
+            color: var(--muted);
+            text-decoration: line-through;
+        }
+
+        .capture-readout {
+            font-size: 0.86rem;
+            color: var(--muted);
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            word-break: break-word;
+        }
+
+        .capture-hint {
+            font-size: 0.86rem;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .code-inline {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.85em;
+            background: rgba(13, 110, 253, 0.08);
+            border-radius: 0.3rem;
+            padding: 0.05rem 0.3rem;
+        }
+
+        .remote-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            padding: 0.6rem 0.8rem;
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-lg);
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .remote-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .remote-status {
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+
+        /* Announced on the device that was acted on, so a remote change is
+           never mistaken for the demo misbehaving. */
+        .remote-notice {
+            position: fixed;
+            left: 50%;
+            bottom: 1.5rem;
+            transform: translateX(-50%);
+            z-index: 50;
+            padding: 0.6rem 1rem;
+            border-radius: 999px;
+            background: rgba(24, 50, 75, 0.92);
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .remote-notice.show {
+            opacity: 1;
+        }
+
+        .model-group {
+            min-width: 220px;
+        }
+
+        .model-switch-state {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.85rem;
+        }
+
+        .model-sync-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .mic-gain-group {
+            min-width: 220px;
+        }
+
+        .mic-gain-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .mic-gain-row .form-range {
+            flex: 1;
+        }
+
+        .mic-gain-value {
+            font-weight: 700;
+            color: var(--primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Post-gain level meter. The marker sits at the level the processing
+           expects, so "fill up to the line while speaking" is the instruction. */
+        .mic-level {
+            position: relative;
+            height: 0.4rem;
+            margin-top: 0.45rem;
+            border-radius: 999px;
+            background: var(--border);
+            overflow: hidden;
+        }
+
+        .mic-level-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: var(--success);
+            transition: width 0.08s linear;
+        }
+
+        .mic-level-bar.low {
+            background: var(--warning);
+        }
+
+        .mic-level-bar.clip {
+            background: var(--danger);
+        }
+
+        .mic-level-target {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 65%;
+            width: 2px;
+            background: rgba(24, 50, 75, 0.45);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 960px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* Stacked (portrait / phone): each panel spans the full width, so a
+               wider, shorter rectangle keeps both visible without excessive
+               vertical scrolling. */
+            .canvas-frame {
+                aspect-ratio: 2.4 / 1;
+                max-height: 40vh;
+            }
+        }
+
+        .signal-card {
+            position: relative;
+            background: var(--surface-strong);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .signal-card.raw::before,
+        .signal-card.enhanced::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 1;
+        }
+
+        .signal-card.raw::before {
+            background: linear-gradient(180deg, var(--raw-glow), transparent 35%);
+        }
+
+        .signal-card.enhanced::before {
+            background: linear-gradient(180deg, var(--enhanced-glow), transparent 35%);
+        }
+
+        .signal-header {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 1rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .signal-title-wrap h2 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 750;
+        }
+
+        .signal-tag {
+            border-radius: 999px;
+            padding: 0.45rem 0.75rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .signal-tag.raw {
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        .signal-tag.enhanced {
+            color: var(--success);
+            background: var(--success-soft);
+        }
+
+        .spectrogram-shell {
+            position: relative;
+            z-index: 1;
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            background: #fff;
+            padding: 0.8rem;
+        }
+
+        .canvas-frame {
+            position: relative;
+            width: 100%;
+            /* Side-by-side (landscape / laptop / tablet): each panel is ~half
+               width, so a 16:9 rectangle reads well as a spectrogram. */
+            aspect-ratio: 16 / 9;
+            max-height: 56vh;
+            border-radius: 0.8rem;
+            overflow: hidden;
+            background: var(--spectro-bg);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+        }
+
+        .canvas-frame canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .freq-label {
+            position: absolute;
+            top: 0.65rem;
+            left: 0.7rem;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.92);
+            background: rgba(0,0,0,0.34);
+            padding: 0.22rem 0.48rem;
+            border-radius: 0.45rem;
+            backdrop-filter: blur(3px);
+        }
+
+        .axis-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.75rem;
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .axis-time {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .explanation-row {
+            margin-top: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .compare-bar {
+            margin: 2rem 0 1.25rem;
+            padding: 0.9rem 1rem;
+            background: rgba(255,255,255,0.7);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .compare-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .compare-subtitle {
+            margin: 0.15rem 0 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .legend-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .legend-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #fff;
+            font-size: 0.88rem;
+            color: var(--text);
+        }
+
+        .legend-swatch {
+            width: 0.8rem;
+            height: 0.8rem;
+            border-radius: 50%;
+        }
+
+        .legend-swatch.raw {
+            background: var(--primary);
+        }
+
+        .legend-swatch.enhanced {
+            background: var(--success);
+        }
+
+        .debug-panel {
+            margin-top: 1.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            background: rgba(255,255,255,0.84);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .debug-summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 1rem 1.15rem;
+            font-weight: 700;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .debug-summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .debug-summary::after {
+            content: "▾";
+            color: var(--muted);
+            font-size: 1rem;
+            transition: transform 0.2s ease;
+        }
+
+        details[open] .debug-summary::after {
+            transform: rotate(180deg);
+        }
+
+        .debug-content {
+            padding: 0 1.15rem 1.15rem;
+        }
+
+        .debug-section-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1rem 0 0.7rem;
+        }
+
+        .debug-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .debug-card {
+            background: #fcfdff;
+            border: 1px solid var(--border);
+            border-radius: 0.9rem;
+            padding: 0.8rem 0.9rem;
+        }
+
+        .debug-label {
+            font-size: 0.78rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.25rem;
+        }
+
+        .debug-value {
+            font-size: 1rem;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .status-dot {
+            width: 0.72rem;
+            height: 0.72rem;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.45rem;
+            vertical-align: middle;
+            background: #adb5bd;
+        }
+
+        .status-ok {
+            background: var(--success);
+        }
+
+        .status-warn {
+            background: var(--warning);
+        }
+
+        .status-bad {
+            background: var(--danger);
+        }
+
+        .footer-link {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .footer-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .control-card {
+                align-items: stretch;
+            }
+
+            .control-group {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .status-chip {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body
+    data-room-name="{{ room.room_name }}"
+    data-model-name="{{ room.model_name }}"
+    data-signaling-url="{{ signaling_ws_url }}"
+    data-signaling-port="{{ signaling_ws_port }}"
+    data-available-models="{{ available_models_json }}">
+
+<div class="demo-page">
+
+    <header class="topbar">
+        <div class="brand-block">
+            <div class="eyebrow">Audio Processing Demonstrator</div>
+            <h1 class="hero-title" id="heroTitle">
+                {% if room.title %}
+                    {{ room.title }}
+                {% else %}
+                    Microphone vs. Enhanced Signal
+                {% endif %}
+            </h1>
+
+            <p class="hero-subtitle">
+                {% if room.description %}
+                    {{ room.description }}
+                {% else %}
+                    Compare the live raw microphone spectrogram with the enhanced output produced by the
+                    real-time speech processing pipeline.
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="chip-stack">
+            <div class="status-chip" id="processing-chip" aria-live="polite">
+                <span class="chip-dot off" id="processing-chip-dot"></span>
+                <span id="processing-chip-text">Processing inactive</span>
+            </div>
+
+            <!-- An insecure origin blocks microphone access outright, so say so
+                 on load rather than letting Start mysteriously do nothing. -->
+            <div class="insecure-chip d-none" id="insecure-chip" role="alert">
+                <span aria-hidden="true">⚠</span>
+                <span>Insecure origin — the microphone is blocked here.
+                      Use <b>https://</b> or <b>http://localhost</b>.</span>
+            </div>
+
+            <!-- Browser-side 3A competes with what this demo is showing, so make
+                 it impossible to demo with it on by accident. -->
+            <div class="browser-dsp-chip d-none" id="browser-dsp-chip" role="status">
+                <span aria-hidden="true">⚠</span>
+                <span>Browser processing active: <b id="browser-dsp-list"></b></span>
+            </div>
+        </div>
+    </header>
+
+    <section class="control-card" aria-label="Demo controls">
+        <div class="button-group">
+            <div class="remote-title" id="localGroupLabel">This device</div>
+            <div class="control-group">
+                <button id="startButton" type="button" class="btn btn-primary btn-lg">Start</button>
+                <button id="hangupButton" type="button" class="btn btn-outline-danger btn-lg">Stop</button>
+                <button id="muteButton" type="button" class="btn btn-outline-secondary btn-lg">Mute</button>
+                <button id="demoSpeechButton" type="button" class="btn btn-outline-secondary btn-lg d-none">
+                    Demo audio
+                </button>
+            </div>
+        </div>
+
+        <!-- Hidden on a device whose wording declares that processing happens
+             elsewhere; see the label-set behaviour block in webrtc.js. -->
+        <div class="control-group" id="maskingGroup">
+            <label class="toggle-pill" for="masking">
+                <input type="checkbox" id="masking" checked>
+                <span>Enable enhancement</span>
+            </label>
+        </div>
+
+        <!-- Hidden until switched on in the debug panel: operating the far end
+             from here is a presenter convenience, not a participant control. -->
+        <div class="remote-group d-none" id="remoteGroup">
+            <div class="remote-title" id="remoteTitleText">Other participants</div>
+            <label class="toggle-pill" for="remoteMute">
+                <input type="checkbox" id="remoteMute">
+                <span>Muted</span>
+            </label>
+            <label class="toggle-pill" for="remoteMasking">
+                <input type="checkbox" id="remoteMasking" checked>
+                <span>Enhancement</span>
+            </label>
+            <div class="remote-status" id="remoteStatus">No participants</div>
+        </div>
+
+        <!-- Only rendered for rooms offering more than one model; JS hides it
+             otherwise so single-model rooms look exactly as they did. -->
+        <div class="model-group d-none" id="modelGroup">
+            <label for="modelSelect" class="form-label mb-1">
+                <span class="remote-title" id="modelGroupLabelText">Model</span>
+                <span class="model-switch-state" id="modelSwitchState"></span>
+            </label>
+            <select id="modelSelect" class="form-select form-select-sm"></select>
+            <label class="model-sync-pill" for="modelSyncPeers">
+                <input type="checkbox" id="modelSyncPeers">
+                <span>Switch for everyone</span>
+            </label>
+        </div>
+
+        <div class="mic-gain-group">
+            <label for="micGain" class="form-label mb-1">
+                <span class="remote-title" id="micGainLabelText">Microphone gain</span>
+                <span class="mic-gain-value" id="micGainValue">0 dB</span>
+            </label>
+
+            <div class="mic-gain-row">
+                <input type="range" class="form-range" id="micGain"
+                       min="-12" max="36" step="1" value="0"
+                       aria-describedby="micGainValue">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="micGainReset">
+                    Reset
+                </button>
+            </div>
+
+            <!-- Post-gain input level, so the slider can be set by eye. -->
+            <div class="mic-level" role="img" aria-label="Microphone input level">
+                <div class="mic-level-bar" id="micLevelBar"></div>
+                <div class="mic-level-target"></div>
+            </div>
+        </div>
+
+        <div class="transmission-mode-group" id="transmissionModeGroup">
+            <label for="transmissionMode" class="form-label mb-1">Transmission mode</label>
+            <select id="transmissionMode" class="form-select form-select-sm">
+                <option value="raw">Unprocessed microphone</option>
+                <option value="preprocessed">Preprocessed</option>
+                <option value="full" selected>Fully processed</option>
+            </select>
+        </div>
+
+    </section>
+
+    <!-- <section class="compare-bar" aria-label="Comparison explanation">
+        <div>
+            <p class="compare-title">Live comparison</p>
+            <p class="compare-subtitle">Choose which live signals to compare in the two panels.</p>
+        </div>
+    </section> -->
+
+    <section class="comparison-grid" aria-label="Signal comparison panels">
+
+        <article class="signal-card raw">
+            <div class="signal-header">
+                <div class="signal-title-wrap">
+                    <h2 id="left-panel-title">Raw Microphone</h2>
+                </div>
+
+                <div class="panel-controls" id="leftPanelControls">
+                    <label for="leftSignalSelect" class="form-label mb-1">Show</label>
+                    <select id="leftSignalSelect" class="form-select form-select-sm">
+                        <option value="mic" selected>Microphone</option>
+                        <option value="enhanced">Enhanced</option>
+                        <option value="reference">Reference / Loudspeaker</option>
+                        <option value="preprocessed">Preprocessed</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="spectrogram-shell">
+                <div class="canvas-frame">
+                    <span class="freq-label">8 kHz</span>
+                    <canvas id="spectrogram"></canvas>
+                </div>
+
+                <div class="axis-row">
+                    <span>Frequency ↑</span>
+                    <span class="axis-time" id="x-axis-spectrogram">—</span>
+                </div>
+
+                <div class="explanation-row">
+                    <span id="left-panel-explanation">Shows the selected live signal spectrum.</span>
+                    <span>Time →</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="signal-card enhanced">
+            <div class="signal-header">
+                <div class="signal-title-wrap">
+                    <h2 id="right-panel-title">Enhanced Output</h2>
+                </div>
+
+                <div class="panel-controls" id="rightPanelControls">
+                    <label for="rightSignalSelect" class="form-label mb-1">Show</label>
+                    <select id="rightSignalSelect" class="form-select form-select-sm">
+                        <option value="mic">Microphone</option>
+                        <option value="enhanced" selected>Enhanced</option>
+                        <option value="reference">Reference / Loudspeaker</option>
+                        <option value="preprocessed">Preprocessed</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="spectrogram-shell">
+                <div class="canvas-frame">
+                    <span class="freq-label">8 kHz</span>
+                    <canvas id="spectrogram-processed"></canvas>
+                </div>
+
+                <div class="axis-row">
+                    <span>Frequency ↑</span>
+                    <span class="axis-time" id="x-axis-processed">—</span>
+                </div>
+
+                <div class="explanation-row">
+                    <span id="right-panel-explanation">Shows the selected live signal spectrum.</span>
+                    <span>Time →</span>
+                </div>
+            </div>
+        </article>
+
+    </section>
+
+    <details class="debug-panel">
+        <summary class="debug-summary">Debug / Status Panel</summary>
+
+        <div class="debug-content">
+
+            <div class="debug-section-title">System state</div>
+            <div class="debug-grid">
+                <div class="debug-card">
+                    <div class="debug-label">WebSocket</div>
+                    <div class="debug-value" id="dbg-websocket">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Worker</div>
+                    <div class="debug-value" id="dbg-worker">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Worklet</div>
+                    <div class="debug-value" id="dbg-worklet">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Processing</div>
+                    <div class="debug-value" id="dbg-masking">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Transmission Mode</div>
+                    <div class="debug-value" id="dbg-transmission-mode">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Muted</div>
+                    <div class="debug-value" id="dbg-muted">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Mic Gain</div>
+                    <div class="debug-value" id="dbg-mic-gain">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Mic Level (post-gain)</div>
+                    <div class="debug-value" id="dbg-mic-level">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Screen Wake Lock</div>
+                    <div class="debug-value" id="dbg-wakelock">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Peers</div>
+                    <div class="debug-value" id="dbg-peers">—</div>
+                </div>
+            </div>
+
+            <div class="debug-section-title">Presentation</div>
+            <div class="capture-panel">
+                <div>
+                    <label for="labelSetSelect" class="form-label mb-1">Signal wording</label>
+                    <select id="labelSetSelect" class="form-select form-select-sm"></select>
+                </div>
+                <p class="capture-hint">
+                    Which vocabulary the spectrogram panels and their dropdowns
+                    use. Applies to this screen only, and is remembered here —
+                    the other device keeps its own setting. Append
+                    <span class="code-inline">?labels=demo</span> to the URL to
+                    open a display straight into the demo wording.
+                    <b>demo</b> also turns local enhancement off and hides its
+                    toggle, opens the controls for other participants, and makes
+                    model switches apply to everyone.
+                </p>
+            </div>
+
+            <div class="debug-section-title">Remote control</div>
+            <div class="capture-panel">
+                <div class="capture-toggles">
+                    <label for="remoteControlEnable">
+                        <input type="checkbox" id="remoteControlEnable">
+                        <span>Show controls for other participants</span>
+                    </label>
+                    <label for="remoteControlAccept">
+                        <input type="checkbox" id="remoteControlAccept" checked>
+                        <span>Accept remote control of this device</span>
+                    </label>
+                </div>
+                <p class="capture-hint">
+                    Lets one device mute the others and switch their enhancement
+                    on or off, so a demo can be run from a single handset.
+                    Accepting is on by default — it is the same room-wide trust
+                    that already lets a peer change your model. Untick it to opt
+                    out; any command that is applied is announced on screen.
+                </p>
+            </div>
+
+            <div class="debug-section-title">Browser-Side Capture Options</div>
+            <div class="capture-panel">
+                <div>
+                    <label for="captureDevice" class="form-label mb-1">Microphone</label>
+                    <select id="captureDevice" class="form-select form-select-sm">
+                        <option value="">System default</option>
+                    </select>
+                </div>
+
+                <div class="capture-toggles">
+                    <label for="capAgc">
+                        <input type="checkbox" id="capAgc"><span>Auto gain control</span>
+                    </label>
+                    <label for="capAec">
+                        <input type="checkbox" id="capAec"><span>Echo cancellation</span>
+                    </label>
+                    <label for="capNs">
+                        <input type="checkbox" id="capNs"><span>Noise suppression</span>
+                    </label>
+                </div>
+
+                <div class="capture-readout" id="capture-readout">Not capturing</div>
+            </div>
+
+            <div class="debug-section-title">Delay Compensation</div>
+            <div class="capture-panel">
+                <div>
+                    <button type="button" id="measureDelayButton" class="btn btn-sm btn-outline-secondary">Measure delay</button>
+                </div>
+                <div class="capture-readout" id="delay-readout">Not measured</div>
+            </div>
+
+            <div class="debug-section-title">Model / runtime</div>
+            <div class="debug-grid">
+                <div class="debug-card">
+                    <div class="debug-label">Model</div>
+                    <div class="debug-value" id="dbg-model">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Room</div>
+                    <div class="debug-value" id="dbg-room">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Hop Size</div>
+                    <div class="debug-value" id="dbg-hop">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">FFT Size</div>
+                    <div class="debug-value" id="dbg-nfft">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Input Streams</div>
+                    <div class="debug-value" id="dbg-inputs">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Chunk / Look-ahead</div>
+                    <div class="debug-value" id="dbg-chunk">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Signal Wording</div>
+                    <div class="debug-value" id="dbg-label-set">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Sample Rate</div>
+                    <div class="debug-value" id="dbg-samplerate">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Preprocessing</div>
+                    <div class="debug-value" id="dbg-preprocessing">—</div>
+                </div>
+            </div>
+
+            <div class="debug-section-title">Processing / performance</div>
+            <div class="debug-grid">
+                <div class="debug-card">
+                    <div class="debug-label">Worker Frames Received</div>
+                    <div class="debug-value" id="dbg-worker-frames-in">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Worker Frames Processed</div>
+                    <div class="debug-value" id="dbg-worker-frames-out">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Worker Frames Dropped</div>
+                    <div class="debug-value" id="dbg-worker-dropped">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Worklet Messages Sent</div>
+                    <div class="debug-value" id="dbg-worklet-sent">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Worklet Messages Received</div>
+                    <div class="debug-value" id="dbg-worklet-received">—</div>
+                </div>
+                <div class="debug-card">
+                    <div class="debug-label">Output Underruns</div>
+                    <div class="debug-value" id="dbg-underruns">—</div>
+                </div>
+            </div>
+
+        </div>
+    </details>
+
+    <div class="footer-link">
+        <a href="{% url 'connection:home' %}">Back to Home</a>
+    </div>
+</div>
+
+<div class="remote-notice" id="remoteNotice" role="status" aria-live="polite"></div>
+
+<audio id="localAudio" playsinline autoplay muted></audio>
+<audio id="remoteAudio" playsinline autoplay></audio>
+
+<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'webrtc.js' %}"></script>
+</body>
+</html>
